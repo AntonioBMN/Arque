@@ -63,7 +63,7 @@ class App extends Component {
     }
 
     mint = (color) => {
-        this.state.contract.methods.mint(color).send({ from: this.state.account }).once('receipt', (receipt) => {
+        this.state.contract.methods.buy(color).send({ from: this.state.account }).once('receipt', (receipt) => {
             this.setState({
                 colors: [...this.state.colors, color]
             })
@@ -118,7 +118,7 @@ class App extends Component {
                                 }}>
 
                                     <input type='text' className='form-control mb-1' placeholder='e.g. #FFFFFF' ref={(input) => { this.color = input }} />
-                                    <input type='submit' className='btn btn-block btn-primary' value='MINT' />
+                                    <input type='submit' className='btn btn-block btn-primary' value='COST 1 ETH TO MINT' />
                                 </form>
                             </div>
                             </main>
