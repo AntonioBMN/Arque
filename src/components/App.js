@@ -48,22 +48,14 @@ class App extends Component {
         }
 
     }
-     int_to_hex = (num) => {
-    var hex = Math.round(num).toString(16);
-    if (hex.length == 1)
-        hex = '0' + hex;
-    return hex;
-}
 
     inserirAleatorio = () => {
-        for(var i = 0; i < 12; i+=1) {
             var g = Math.random()*16777215;
-            this.mint('#'+parseInt(g).toString(16));
-        }
+            return parseInt(g).toString(16)
     }
 
     mint = (color) => {
-        this.state.contract.methods.buy(color).send({ from: this.state.account }).once('receipt', (receipt) => {
+        this.state.contract.methods.mint(color).send({ from: this.state.account, value:100000000000000000 }).once('receipt', (receipt) => {
             this.setState({
                 colors: [...this.state.colors, color]
             })
@@ -100,7 +92,7 @@ class App extends Component {
                 <div className="container-fluid mt-5">
                     <div className="row">
                         <main role="main" className="col-lg-12 d-flex text-center">
-                            <div className="content mr-auto ml-auto">
+                            {/*<div className="content mr-auto ml-auto">
                                 <h1> Mint </h1>
                                 <form onSubmit={(event) => {
                                     event.preventDefault()
@@ -116,9 +108,27 @@ class App extends Component {
                                         alert("Imput não é Hexadecimal");
                                     }
                                 }}>
-
                                     <input type='text' className='form-control mb-1' placeholder='e.g. #FFFFFF' ref={(input) => { this.color = input }} />
-                                    <input type='submit' className='btn btn-block btn-primary' value='COST 1 ETH TO MINT' />
+                                    <input type='submit' className='btn btn-block btn-primary' value='MINT'/>
+                                </form>
+                            </div>*/}
+                            <div className="content mr-auto ml-auto">
+                                <h1> Mint Aleatório </h1>
+                                <form onSubmit={(event) => {
+                                    event.preventDefault()
+                                    const color = this.inserirAleatorio();
+                                    var re = /[0-9A-Fa-f]{6}/g;
+                                    if (re.test(color)) {
+                                        if (parseInt(color, 16) <= parseInt('FFFFFF', 16)) {
+                                            this.mint("#" + color);
+                                        } else {
+                                            alert("Hexadecimal maior que o aceito");
+                                        }
+                                    } else {
+                                        alert("Imput não é Hexadecimal");
+                                    }
+                                }}>
+                                    <input type='submit' className='btn btn-block btn-primary' value='MINT Aleatório'/>
                                 </form>
                             </div>
                             </main>
