@@ -4,6 +4,7 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract Obra is  ERC721 {
+    //struct referente aos dados das obras
     struct dadosDaObra {
     string nomeDoAutor;
     uint64 cpfDoAutor;
@@ -17,9 +18,12 @@ contract Obra is  ERC721 {
     string descricao;
 }
     dadosDaObra[] public dadosDasObras;
-
+    //mapping que armazena os dados de determinada obra
     mapping (uint => dadosDaObra) idToDados;
+    //mapping que armazena as obras que determinado endereço possui
     mapping (address => uint) addressToId;
+    //mapping para verificar se uma determinada Obra já foi mintada
+    mapping (uint => bool) nftExists;
 
     event DadosDaObra (
     string _nomeDoAutor,
@@ -35,11 +39,11 @@ contract Obra is  ERC721 {
 );
 
     constructor () ERC721("Obra", "OBRA") {} 
-
+    //função que retorna uma Obra passando o ID dela;
     function getDadosDaObra(uint _id) public view returns (dadosDaObra memory) {
         return dadosDasObras[_id];
     }
-
+    //Função que cria a struct dadosDaObra e insere ela no array de structs "dadosDasObras";
     function createDadosDaObra (
         string memory _nomeDoAutor,
         uint64 _cpfDoAutor,
@@ -59,10 +63,13 @@ contract Obra is  ERC721 {
 
     function mint (dadosDaObra memory _dados, uint _id) public {
         //Requerir que a mesma NFT não seja mintada mais de uma vez
-        require(addressToId[msg.sender] != _id);
+        require(!nftExists[_id]);
         //Adiciona no mapping Id To Dados para que tenhamos acesso a quem mintou determinada NFT
         idToDados[_id] = _dados;
+        //Minta com a função de mint da biblioteca ERC721
         _mint(msg.sender, _id);
+        //Adiciona a NFT no mapping de existencia de NFTs
+        nftExists[_id] = true;
     }
 
 
