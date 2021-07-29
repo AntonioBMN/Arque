@@ -6,17 +6,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract Obra is  ERC721 {
     //struct referente aos dados das obras
     struct dadosDaObra {
-    string nomeDoAutor;
-    uint64 cpfDoAutor;
-    string nomeArtisticoDoAutor;
-    string[]  coAutores;
-    uint64[] cpfDoCoautor;
-    string nomeDoTitular;
-    uint64 cpfDoTitular;
     string nomeDaObra;
     string tipoDeObra;
     string descricao;
 }
+    //Array que armazena os dadosDasObras
     dadosDaObra[] public dadosDasObras;
     //mapping que armazena os dados de determinada obra
     mapping (uint => dadosDaObra) idToDados;
@@ -26,13 +20,6 @@ contract Obra is  ERC721 {
     mapping (uint => bool) nftExists;
 
     event DadosDaObra (
-    string _nomeDoAutor,
-    uint64 _cpfDoAutor,
-    string _nomeArtisticoDoAutor,
-    string[] _coAutores,
-    uint64[] _cpfDoCoautor,
-    string _nomeDoTitular,
-    uint64  _cpfDoTitular,
     string _nomeDaObra,
     string _tipoDaObra,
     string _descricao
@@ -46,18 +33,12 @@ contract Obra is  ERC721 {
 
     //Função que cria a struct dadosDaObra e insere ela no array de structs "dadosDasObras";
     function createDadosDaObra (
-        string memory _nomeDoAutor,
-        uint64 _cpfDoAutor,
-        string memory _nomeArtisticoDoAutor,
-        string[] memory _coAutores,
-        uint64[] memory _cpfDoCoautor,
-        string memory _nomeDoTitular,
-        uint64  _cpfDoTitular,
         string memory _nomeDaObra,
         string memory _tipoDaObra,
         string memory _descricao) public {
-        dadosDasObras.push(dadosDaObra(_nomeDoAutor,_cpfDoAutor,_nomeArtisticoDoAutor, _coAutores, _cpfDoCoautor,_nomeDoTitular,_cpfDoTitular,_nomeDaObra,_tipoDaObra,_descricao));
-        emit DadosDaObra(_nomeDoAutor,_cpfDoAutor,_nomeArtisticoDoAutor, _coAutores, _cpfDoCoautor,_nomeDoTitular,_cpfDoTitular,_nomeDaObra,_tipoDaObra,_descricao);
+            dadosDasObras.push(dadosDaObra(_nomeDaObra,_tipoDaObra,_descricao));
+
+        emit DadosDaObra(_nomeDaObra,_tipoDaObra,_descricao);
     }
 
     function mint (dadosDaObra memory _dados, uint _id) public {
@@ -66,9 +47,24 @@ contract Obra is  ERC721 {
         //Adiciona no mapping Id To Dados para que tenhamos acesso a quem mintou determinada NFT
         idToDados[_id] = _dados;
         //Minta com a função de mint da biblioteca ERC721
-        _mint(msg.sender, _id);
+        _safeMint(msg.sender, _id);
         //Adiciona a NFT no mapping de existencia de NFTs
         nftExists[_id] = true;
     }
 
+    function sellNFT(address _address, uint _id) public {
+        approve(_address, _id);
+    }
+    
+    function transferObra(address _from,address _to,uint _id ) public {
+        safeTransferFrom(_from,_to , _id);
+    }
+
+    function buyObra(uint _id, uint _value)  public payable {
+    address _to = msg.sender;
+    address  _from = ownerOf(_id);
+    require(msg.value  == _value);
+    _to.call{value: _value}("");
+    transferObra(_from, _to, _id);    
+    }
 }

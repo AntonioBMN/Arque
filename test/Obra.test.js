@@ -37,15 +37,8 @@ contract('Obra',(accounts) => {
     describe('Criar dadosDaObra', async() => {
         it('Chama a função criarDadosDaObra', async() => {
             var test = [];
-            const result = await contract.createDadosDaObra( "Antonio Bezerra de Morais Neto", "08468689386",  "",  test, test, "Antonio Bezerra de Morais Neto", "08468689386", "Obra NFT", "Programa de Computador", "Programa de Computador que armazena uma Obra no formato de NFT");
+            const result = await contract.createDadosDaObra("Obra NFT", "Programa de Computador", "Programa de Computador que armazena uma Obra no formato de NFT");
             const event = result.logs[0].args;
-            assert.equal(event._nomeDoAutor, 'Antonio Bezerra de Morais Neto', 'Nome do Autor correto' );
-            assert.equal(event._cpfDoAutor.toNumber(), '08468689386', 'Nome do Autor correto' );
-            assert.equal(event._nomeArtisticoDoAutor, '', 'Nome artistico do Autor correto' );
-            assert.equal(event._coAutores, '', 'Nome do CoAutor correto');
-            assert.equal(event._cpfDoCoautor, '', 'CPF do CoAutor correto');
-            assert.equal(event._nomeDoTitular, 'Antonio Bezerra de Morais Neto', 'Nome do titular correto');
-            assert.equal(event._cpfDoTitular.toNumber(), '08468689386', 'CPF do titular correto');
             assert.equal(event._nomeDaObra, 'Obra NFT', 'Nome da Obra correto');
             assert.equal(event._tipoDaObra, 'Programa de Computador', 'Tipo da Obra correto');
             assert.equal(event._descricao, 'Programa de Computador que armazena uma Obra no formato de NFT', 'Descrição da Obra correto');
@@ -54,7 +47,7 @@ contract('Obra',(accounts) => {
     describe('Minta uma Obra', async()=> {
         it('Minta uma Obra', async()=>{
             var test = [];
-            await contract.createDadosDaObra( "Antonio Bezerra de Morais Neto", "08468689386",  "",  test, test, "Antonio Bezerra de Morais Neto", "08468689386", "Obra NFT", "Programa de Computador", "Programa de Computador que armazena uma Obra no formato de NFT");
+            await contract.createDadosDaObra("Obra NFT", "Programa de Computador", "Programa de Computador que armazena uma Obra no formato de NFT",);
             const a = await contract.getDadosDaObra(0);
             const result = await contract.mint(a,'123231',{from: accounts[0]});
             const event = result.logs[0].args;
@@ -62,9 +55,14 @@ contract('Obra',(accounts) => {
             assert.equal(event.from,'0x0000000000000000000000000000000000000000')
             assert.equal(event.to,accounts[0])
 
-        it            
+            const b = await contract.ownerOf("123231")
+            assert.equal(b,accounts[0], "Account 0 é dono dessa NFT")
 
 
+            await contract.sellNFT(accounts[3],"123231")
+            await contract.buyObra("123231",7000000000000, {from: accounts[3], value:7000000000000})
+            const d = await contract.ownerOf("123231")
+            assert.equal(d, accounts[3], "Account 1 é dono dessa NFT")
         })
     })
 })
