@@ -59,10 +59,11 @@ contract('Obra',(accounts) => {
             assert.equal(b,accounts[0], "Account 0 é dono dessa NFT")
 
 
-            await contract.sellNFT(accounts[3],"123231")
-            await contract.buyObra("123231",7000000000000, {from: accounts[3], value:7000000000000})
-            const d = await contract.ownerOf("123231")
-            assert.equal(d, accounts[3], "Account 1 é dono dessa NFT")
+            await contract.announce("123231","300000000000000")
+            await contract.placeBid("123231","400000000000000",{from: accounts[1],value: 400000000000000})
+            await contract.closeAuction("123231")
+            const c = await contract.ownerOf("123231")
+            assert.equal(c,accounts[1], "Account 0 é dono dessa NFT")
         })
     })
 })
